@@ -25,29 +25,29 @@ dependencies = [
 ]
 
 [project.scripts]
-appgenerator = "pyforge.main:app"
-pyforge = "pyforge.main:app"
+app-generator-cli = "app_generator.main:app"
+app_generator = "app_generator.main:app"
 
 [project.urls]
-Homepage = "https://github.com/rajendrakumaryadav/pyforge"
-Repository = "https://github.com/rajendrakumaryadav/pyforge"
-Issues = "https://github.com/rajendrakumaryadav/pyforge/issues"
+Homepage = "https://github.com/rajendrakumaryadav/app-generator-cli"
+Repository = "https://github.com/rajendrakumaryadav/app-generator-cli"
+Issues = "https://github.com/rajendrakumaryadav/app-generator-cli/issues"
 
 [tool.uv.build-backend]
-module-name = "pyforge"
+module-name = "app_generator"
 module-root = ""
-source-include = ["src/pyforge/**", "README.md", "LICENSE"]
+source-include = ["app_generator/**", "README.md", "LICENSE"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-exclude = ["pyforge/templates"]
+exclude = ["app_generator/templates"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.mypy]
-exclude = "^pyforge/templates/"
+exclude = "^app_generator/templates/"
 
 [build-system]
 requires = ["uv_build>=0.11.2,<0.12"]
