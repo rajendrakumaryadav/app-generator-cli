@@ -1,9 +1,11 @@
 # ⚒ AppGenerator CLI
 
-[![CI](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/app-generator-cli)](https://pypi.org/project/app-generator-cli/)
+[![CI](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/rajendrakumaryadav/app-generator-cli/actions)
+[![PyPI version](https://img.shields.io/pypi/v/app-generator-cli?cacheSeconds=60)](https://pypi.org/project/app-generator-cli/)
 [![pytest](https://img.shields.io/badge/pytest-3.10%20%7C%203.11%20%7C%203.12-0A9EDC?logo=pytest)](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml) 
-
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+[![GitHub issues](https://img.shields.io/github/issues/rajendrakumaryadav/app-generator-cli)](https://github.com/rajendrakumaryadav/app-generator-cli/issues)
+[![GitHub license](https://img.shields.io/github/license/rajendrakumaryadav/app-generator-cli)](https://github.com/rajendrakumaryadav/app-generator-cli/blob/main/LICENSE)
 > Scaffold production-ready Python projects in seconds — powered by `uv`.
 
 CI runs `uv run pytest tests/ -v --tb=short` on Python `3.10`, `3.11`, and `3.12`.
