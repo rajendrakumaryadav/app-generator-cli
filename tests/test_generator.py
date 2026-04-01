@@ -171,6 +171,63 @@ class TestProjectGenerator:
         )
         assert result.exit_code != 0
 
+    def test_detect_project_template_fastapi_with_frontend(self, tmp_path):
+        from app_generator.generator import detect_project_template
+
+        project = tmp_path / "web_proj"
+        (project / "app" / "templates").mkdir(parents=True)
+        (project / "app" / "models").mkdir(parents=True)
+        (project / "app" / "models" / "base.py").write_text("from sqlmodel import SQLModel\n")
+
+        assert detect_project_template(project) == "fastapi-with-frontend"
+
+    def test_create_model_file_fastapi_sqlmodel(self, tmp_path):
+        from app_generator.generator import ModelFieldSpec, create_model_file
+
+        project = tmp_path / "api_proj"
+        (project / "app" / "models").mkdir(parents=True)
+        (project / "app" / "models" / "base.py").write_text("from sqlmodel import SQLModel\n")
+
+        out = create_model_file(
+            project_root=project,
+            template="fastapi",
+            model_name="BlogPost",
+            fields=[
+                ModelFieldSpec(name="title", data_type="str", required=True, nullable=False, max_length=120),
+                ModelFieldSpec(name="rating", data_type="int", required=False, nullable=True),
+            ],
+        )
+        content = out.read_text()
+
+        assert out == project / "app" / "models" / "blog_post.py"
+        assert "class BlogPost(BaseModel, table=True):" in content
+        assert "title: str = Field(nullable=False, max_length=120)" in content
+        assert "rating: int | None = Field(default=None, nullable=True)" in content
+
+    def test_create_model_file_ai_pydantic(self, tmp_path):
+        from app_generator.generator import ModelFieldSpec, create_model_file
+
+        project = tmp_path / "ai_proj"
+        (project / "app" / "agents").mkdir(parents=True)
+        (project / "app" / "chains").mkdir(parents=True)
+
+        out = create_model_file(
+            project_root=project,
+            template="ai",
+            model_name="ToolInput",
+            fields=[
+                ModelFieldSpec(name="query", data_type="str", required=True),
+                ModelFieldSpec(name="top_k", data_type="int", required=False),
+            ],
+        )
+        content = out.read_text()
+
+        assert out == project / "app" / "models" / "tool_input.py"
+        assert "from pydantic import BaseModel, Field" in content
+        assert "class ToolInput(BaseModel):" in content
+        assert "query: str = Field(...)" in content
+        assert "top_k: int | None = Field(default=None)" in content
+
 
 # ── CLI smoke tests ───────────────────────────────────────────────────────────
 
@@ -204,3 +261,4 @@ class TestCLI:
         assert "fastapi" in result.output
         assert "fastapi-with-frontend" in result.output
         assert "ai" in result.output
+        assert "model" in result.output

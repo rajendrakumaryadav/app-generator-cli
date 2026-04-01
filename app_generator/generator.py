@@ -7,6 +7,7 @@ from __future__ import annotations
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -73,6 +74,8 @@ class ProjectGenerator:
         "postgres": ["asyncpg", "psycopg2-binary"],
         "redis": ["redis", "hiredis"],
     }
+
+    MODEL_TEMPLATES = {"fastapi", "fastapi-with-frontend", "ai"}
 
     def __init__(
         self,
@@ -263,3 +266,129 @@ class ProjectGenerator:
             Panel(table, title="[bold green]✓  Project created[/]", border_style="green")
         )
         console.print()
+
+
+@dataclass(slots=True)
+class ModelFieldSpec:
+    name: str
+    data_type: str
+    required: bool = True
+    nullable: bool = False
+    max_length: int | None = None
+
+
+def detect_project_template(project_root: Path) -> str:
+    if (project_root / "app" / "templates").exists() and (project_root / "app" / "models" / "base.py").exists():
+        return "fastapi-with-frontend"
+    if (project_root / "app" / "models" / "base.py").exists():
+        return "fastapi"
+    if (project_root / "app" / "agents").exists() and (project_root / "app" / "chains").exists():
+        return "ai"
+    raise ValueError(f"Unable to detect template type for existing project: {project_root}")
+
+
+def validate_model_generation(project_root: Path, template: str) -> None:
+    if not project_root.exists() or not project_root.is_dir():
+        raise ValueError(f"Project path does not exist: {project_root}")
+    if template not in ProjectGenerator.MODEL_TEMPLATES:
+        raise ValueError(f"Unsupported template for model generation: {template}")
+    if not (project_root / "app").exists():
+        raise ValueError("Project must contain an app/ directory")
+    if template in {"fastapi", "fastapi-with-frontend"} and not (project_root / "app" / "models" / "base.py").exists():
+        raise ValueError("FastAPI project missing app/models/base.py; expected scaffolded FastAPI structure")
+
+
+def create_model_file(
+    project_root: Path,
+    template: str,
+    model_name: str,
+    fields: list[ModelFieldSpec],
+) -> Path:
+    validate_model_generation(project_root, template)
+
+    models_dir = (project_root / "app" / "models").resolve()
+    models_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_model_file = f"{_to_snake(model_name)}.py"
+    dest = (models_dir / safe_model_file).resolve()
+    if models_dir not in dest.parents:
+        raise ValueError("Model file path must stay within app/models")
+
+    source = _build_sqlmodel_source(model_name, fields) if template in {"fastapi", "fastapi-with-frontend"} else _build_pydantic_source(model_name, fields)
+    dest.write_text(source, encoding="utf-8")
+    return dest
+
+
+def _to_snake(name: str) -> str:
+    cleaned = "".join(ch if ch.isalnum() else "_" for ch in name.strip())
+    out = []
+    prev_lower = False
+    for ch in cleaned:
+        if ch.isupper() and prev_lower:
+            out.append("_")
+        out.append(ch.lower())
+        prev_lower = ch.isalpha() and ch.islower()
+    return "".join(out).strip("_") or "model"
+
+
+def _to_class(name: str) -> str:
+    parts = [p for p in _to_snake(name).split("_") if p]
+    return "".join(part.capitalize() for part in parts) or "Model"
+
+
+def _field_annotation(data_type: str, required: bool) -> str:
+    return data_type if required else f"{data_type} | None"
+
+
+def _build_sqlmodel_source(model_name: str, fields: list[ModelFieldSpec]) -> str:
+    class_name = _to_class(model_name)
+    imports: list[str] = []
+    if any(field.data_type == "datetime" for field in fields):
+        imports.extend(["from datetime import datetime", ""])
+    imports.extend(["from sqlmodel import Field", "", "from app.models.base import BaseModel", ""])
+    lines = [f"class {class_name}(BaseModel, table=True):", f"    __tablename__ = \"{_to_snake(model_name)}s\"", ""]
+
+    if not fields:
+        lines.append("    pass")
+        return "\n".join(imports + lines) + "\n"
+
+    for field in fields:
+        safe_field_name = _to_snake(field.name)
+        annotation = _field_annotation(field.data_type, field.required)
+        args: list[str] = []
+        if not field.required:
+            args.append("default=None")
+        args.append(f"nullable={field.nullable}")
+        if field.max_length is not None and field.data_type == "str":
+            args.append(f"max_length={field.max_length}")
+        lines.append(f"    {safe_field_name}: {annotation} = Field({', '.join(args)})")
+
+    return "\n".join(imports + lines) + "\n"
+
+
+def _build_pydantic_source(model_name: str, fields: list[ModelFieldSpec]) -> str:
+    class_name = _to_class(model_name)
+    lines: list[str] = []
+    if any(field.data_type == "datetime" for field in fields):
+        lines.extend(["from datetime import datetime", ""])
+    lines.extend(["from pydantic import BaseModel, Field", "", f"class {class_name}(BaseModel):"])
+
+    if not fields:
+        lines.append("    pass")
+        return "\n".join(lines) + "\n"
+
+    for field in fields:
+        safe_field_name = _to_snake(field.name)
+        annotation = _field_annotation(field.data_type, field.required)
+        if field.required:
+            default_expr = "Field(...)"
+        else:
+            extras: list[str] = ["default=None"]
+            if field.max_length is not None and field.data_type == "str":
+                extras.append(f"max_length={field.max_length}")
+            default_expr = f"Field({', '.join(extras)})"
+        lines.append(f"    {safe_field_name}: {annotation} = {default_expr}")
+
+    return "\n".join(lines) + "\n"
+
+

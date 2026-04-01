@@ -93,6 +93,26 @@ cp .env.example .env   # add your OPENAI_API_KEY
 uv run python main.py
 ```
 
+### `app-generator-cli create model --project-path <path>`
+
+Interactively create a model inside an existing generated project.
+
+| Prompt/Flag | Description |
+|------|-------------|
+| `--project-path`, `-p` | Existing project root to update |
+| `--template` | Optional explicit template (`fastapi`, `fastapi-with-frontend`, `ai`) |
+| `Model name` | Output file/class name (written to `app/models/`) |
+| `Field prompts` | Add field name, type, required/nullable, and optional max_length |
+
+**Examples:**
+```bash
+# SQLModel model in an existing FastAPI project
+app-generator-cli create model --project-path ./my_api
+
+# Pydantic model in an existing AI project
+app-generator-cli create model --project-path ./my_assistant --template ai
+```
+
 ---
 
 ## Generated Project Structure
