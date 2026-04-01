@@ -9,8 +9,8 @@
 CI runs `uv run pytest tests/ -v --tb=short` on Python `3.10`, `3.11`, and `3.12`.
 
 ```
-$ appgenerator create fastapi my_api
-$ appgenerator create ai my_ai_app --docker --postgres
+$ app-generator-cli create fastapi my_api
+$ app-generator-cli create ai my_ai_app --docker --postgres
 ```
 
 ---
