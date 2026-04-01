@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project_name }}{% endblock %}
+
+{% block content %}
+<section class="card">
+  <h1>Welcome to {{ project_name }}</h1>
+  <p>
+    Your FastAPI backend is running with a clean Jinja2 frontend layout.
+    Start by editing <code>app/templates/index.html</code> and your API routes under
+    <code>app/api/v1</code>.
+  </p>
+</section>
+{% endblock %}
+

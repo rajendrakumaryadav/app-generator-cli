@@ -1,0 +1,49 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# uv
+.uv/
+
+# Environment files
+.env
+!.env.example
+
+# Test and coverage outputs
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checking and lint caches
+.mypy_cache/
+.ruff_cache/
+
+# IDE and editor settings
+.idea/
+.vscode/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local runtime artifacts
+*.log
+logs/
+*.db
+*.sqlite3
+chroma_db/
+.langchain.db
+langchain_cache/
+

@@ -1,8 +1,8 @@
 # ⚒ AppGenerator CLI
 
-[![CI](https://github.com/rajendrakumaryadav/pyforge/actions/workflows/ci.yml/badge.svg)](https://github.com/rajendrakumaryadav/pyforge/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/appgenerator-cli)](https://pypi.org/project/appgenerator-cli/)
-[![pytest](https://img.shields.io/badge/pytest-3.10%20%7C%203.11%20%7C%203.12-0A9EDC?logo=pytest)](https://github.com/rajendrakumaryadav/pyforge/actions/workflows/ci.yml) 
+[![CI](https://github.com/rajendrakumaryadav/pyforge/actions/workflows/ci.yml/badge.svg)](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/appgenerator-cli)](https://pypi.org/project/app-generator-cli/)
+[![pytest](https://img.shields.io/badge/pytest-3.10%20%7C%203.11%20%7C%203.12-0A9EDC?logo=pytest)](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml) 
 
 > Scaffold production-ready Python projects in seconds — powered by `uv`.
 
@@ -18,21 +18,21 @@ $ appgenerator create ai my_ai_app --docker --postgres
 ## Installation
 
 ```bash
-pip install appgenerator-cli
+pip install app-generator-cli
 # or, with uv (recommended):
-uv tool install appgenerator-cli
+uv tool install app-generator-cli
 ```
 
 Verify:
 ```bash
-appgenerator --version
+app-generator-cli --version
 ```
 
 ---
 
 ## Commands
 
-### `appgenerator create fastapi <name>`
+### `app-generator-cli create fastapi <name>`
 
 Scaffold a **FastAPI** backend.
 
@@ -45,13 +45,13 @@ Scaffold a **FastAPI** backend.
 
 **Example:**
 ```bash
-appgenerator create fastapi my_api --docker --postgres --redis
+app-generator-cli create fastapi my_api --docker --postgres --redis
 cd my_api
 cp .env.example .env
 uv run uvicorn app.main:app --reload
 ```
 
-### `appgenerator create ai <name>`
+### `app-generator-cli create ai <name>`
 
 Scaffold a **LangChain / LangGraph** AI application.
 
@@ -64,7 +64,7 @@ Scaffold a **LangChain / LangGraph** AI application.
 
 **Example:**
 ```bash
-appgenerator create ai my_assistant --docker
+app-generator-cli create ai my_assistant --docker
 cd my_assistant
 cp .env.example .env   # add your OPENAI_API_KEY
 uv run python main.py
@@ -133,15 +133,15 @@ pip install build twine
 
 # Build wheel + sdist
 python -m build
-# Outputs: dist/appgenerator_cli-0.1.0-py3-none-any.whl
-#          dist/appgenerator_cli-0.1.0.tar.gz
+# Outputs: dist/app-generator-cli-0.1.0-py3-none-any.whl
+#          dist/app-generator-cli-0.1.0.tar.gz
 ```
 
 ### 2. Test on TestPyPI
 
 ```bash
 twine upload --repository testpypi dist/*
-pip install --index-url https://test.pypi.org/simple/ appgenerator-cli
+pip install --index-url https://test.pypi.org/simple/ app-generator-cli
 ```
 
 ### 3. Publish to PyPI
@@ -162,14 +162,14 @@ uv publish
 ## Development Setup
 
 ```bash
-git clone https://github.com/yourname/pyforge-cli
-cd pyforge-cli
+git clone https://github.com/yourname/app-generator-cli
+cd app-generator-cli
 
 uv venv
 uv sync --dev
 
 # Run locally
-uv run appgenerator --help
+uv run app-generator-cli --help
 
 # Tests
 uv run pytest

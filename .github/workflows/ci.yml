@@ -1,0 +1,165 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  pull_request_review:
+    types: [submitted]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  version_bump:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    outputs:
+      bumped: ${{ steps.bump.outputs.bumped }}
+      new_version: ${{ steps.bump.outputs.new_version }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bump version in pyproject.toml
+        id: bump
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import pathlib
+          import re
+          import urllib.error
+          import urllib.request
+
+          event_name = "${{ github.event_name }}"
+          bump = "${{ github.event.inputs.bump || 'patch' }}"
+          package_name = "appgenerator-cli"
+          pyproject = pathlib.Path("pyproject.toml")
+          content = pyproject.read_text(encoding="utf-8")
+
+          match = re.search(r'^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"\s*$', content, re.MULTILINE)
+          if not match:
+              raise SystemExit("Could not find [project].version in pyproject.toml")
+
+          major, minor, patch = map(int, match.groups())
+          current_version = f"{major}.{minor}.{patch}"
+
+          def version_exists_on_pypi(name: str, version: str) -> bool:
+              try:
+                  with urllib.request.urlopen(f"https://pypi.org/pypi/{name}/json", timeout=10) as resp:
+                      payload = json.loads(resp.read().decode("utf-8"))
+              except urllib.error.HTTPError as exc:
+                  if exc.code == 404:
+                      return False
+                  raise
+              except Exception:
+                  # If PyPI cannot be queried, keep current version and let publish fail loudly.
+                  return False
+              return version in payload.get("releases", {})
+
+          should_bump = event_name == "workflow_dispatch"
+          if event_name == "push" and version_exists_on_pypi(package_name, current_version):
+              should_bump = True
+              bump = "patch"
+
+          if should_bump:
+              if bump == "major":
+                  major, minor, patch = major + 1, 0, 0
+              elif bump == "minor":
+                  minor, patch = minor + 1, 0
+              else:
+                  patch += 1
+
+          new_version = f"{major}.{minor}.{patch}"
+          bumped = "true" if new_version != current_version else "false"
+
+          if bumped == "true":
+              updated = content[:match.start(1)] + new_version + content[match.end(3):]
+              pyproject.write_text(updated, encoding="utf-8")
+
+          output_file = pathlib.Path(os.environ["GITHUB_OUTPUT"])
+          with output_file.open("a", encoding="utf-8") as fh:
+              fh.write(f"new_version={new_version}\n")
+              fh.write(f"bumped={bumped}\n")
+          PY
+
+      - name: Commit version bump
+        if: steps.bump.outputs.bumped == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.new_version }} [skip ci]"
+          git push origin "HEAD:${{ github.ref_name }}"
+
+  test:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Type check
+        run: uv run mypy pyforge --ignore-missing-imports
+
+      - name: Run tests
+        run: uv run pytest tests/ -v --tb=short
+
+  publish:
+    needs: [test, version_bump]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    environment: pypi
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Build
+        run: uv build
+
+      - name: Publish to PyPI
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: uv publish
