@@ -54,7 +54,7 @@ jobs:
 
           event_name = "${{ github.event_name }}"
           bump = "${{ github.event.inputs.bump || 'patch' }}"
-          package_name = "appgenerator-cli"
+          package_name = "app-generator-cli"
           pyproject = pathlib.Path("pyproject.toml")
           content = pyproject.read_text(encoding="utf-8")
 

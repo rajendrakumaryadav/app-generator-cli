@@ -10,6 +10,7 @@ CI runs `uv run pytest tests/ -v --tb=short` on Python `3.10`, `3.11`, and `3.12
 
 ```
 $ app-generator-cli create fastapi my_api
+$ app-generator-cli create fastapi-with-frontend my_web_app --docker
 $ app-generator-cli create ai my_ai_app --docker --postgres
 ```
 
@@ -49,6 +50,26 @@ app-generator-cli create fastapi my_api --docker --postgres --redis
 cd my_api
 cp .env.example .env
 uv run uvicorn app.main:app --reload
+```
+
+### `app-generator-cli create fastapi-with-frontend <name>`
+
+Scaffold a **FastAPI + Jinja2 frontend** project.
+
+| Flag | Description |
+|------|-------------|
+| `--docker` | Add `Dockerfile` + `docker-compose.yml` |
+| `--postgres` | Use PostgreSQL (`asyncpg`) instead of SQLite |
+| `--redis` | Add Redis client (`redis`) |
+| `--output PATH` | Create the project in a custom directory |
+
+**Example:**
+```bash
+app-generator-cli create fastapi-with-frontend my_web_app --docker
+cd my_web_app
+cp .env.example .env
+uv run uvicorn app.main:app --reload
+# open http://localhost:8000/ and http://localhost:8000/docs
 ```
 
 ### `app-generator-cli create ai <name>`
@@ -119,6 +140,30 @@ my_assistant/
 ├── pyproject.toml
 ├── Dockerfile           # (--docker)
 └── docker-compose.yml   # (--docker)
+```
+
+### FastAPI + Jinja Frontend
+
+```
+my_web_app/
+├── app/
+│   ├── main.py                    # App + homepage route
+│   ├── templates/
+│   │   ├── base.html              # Base layout
+│   │   ├── index.html             # Homepage
+│   │   └── partials/
+│   │       ├── header.html        # Shared header
+│   │       └── footer.html        # Shared footer
+│   ├── api/v1/
+│   │   └── health.py
+│   └── ...                        # config/db/models/dependencies
+├── tests/
+│   ├── test_health.py
+│   └── test_frontend.py
+├── .env.example
+├── pyproject.toml
+├── Dockerfile                     # (--docker)
+└── docker-compose.yml             # (--docker)
 ```
 
 ---
