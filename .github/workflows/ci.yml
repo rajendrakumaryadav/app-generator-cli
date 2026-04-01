@@ -136,7 +136,7 @@ jobs:
         run: uv run ruff check .
 
       - name: Type check
-        run: uv run mypy pyforge --ignore-missing-imports
+        run: uv run mypy app_generator --ignore-missing-imports
 
       - name: Run tests
         run: uv run pytest tests/ -v --tb=short
