@@ -10,7 +10,7 @@ from typing import Optional
 import typer
 from rich.console import Console
 
-from pyforge.generator import ProjectGenerator
+from app_generator.generator import ProjectGenerator
 
 create_app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 console = Console()

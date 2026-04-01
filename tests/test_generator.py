@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 class TestProjectGenerator:
     def _make_generator(self, template: str, tmp_path: Path, **opts):
-        from pyforge.generator import ProjectGenerator
+        from app_generator.generator import ProjectGenerator
 
         return ProjectGenerator(
             template=template,
@@ -103,7 +103,7 @@ class TestProjectGenerator:
         gen = self._make_generator("fastapi", tmp_path, postgres=True)
         gen.target_dir.mkdir(parents=True, exist_ok=True)
 
-        with patch("pyforge.generator.shutil.which", return_value="uv"), patch.object(
+        with patch("app_generator.generator.shutil.which", return_value="uv"), patch.object(
             gen, "_run"
         ) as run_mock:
             gen._install_deps()
@@ -149,7 +149,7 @@ class TestProjectGenerator:
         assert "test_proj" in content
 
     def test_context_package_name_sanitises_hyphens(self, tmp_path):
-        from pyforge.generator import ProjectGenerator
+        from app_generator.generator import ProjectGenerator
 
         gen = ProjectGenerator(
             template="fastapi",
@@ -162,7 +162,7 @@ class TestProjectGenerator:
 
     def test_existing_directory_raises(self, tmp_path):
         from typer.testing import CliRunner
-        from pyforge.main import app
+        from app_generator.main import app
 
         (tmp_path / "existing_proj").mkdir()
         runner = CliRunner()
@@ -177,7 +177,7 @@ class TestProjectGenerator:
 class TestCLI:
     def test_help(self):
         from typer.testing import CliRunner
-        from pyforge.main import app
+        from app_generator.main import app
 
         runner = CliRunner()
         result = runner.invoke(app, ["--help"])
@@ -186,8 +186,8 @@ class TestCLI:
 
     def test_version(self):
         from typer.testing import CliRunner
-        from pyforge.main import app
-        from pyforge import __version__
+        from app_generator.main import app
+        from app_generator import __version__
 
         runner = CliRunner()
         result = runner.invoke(app, ["--version"])
@@ -196,7 +196,7 @@ class TestCLI:
 
     def test_create_help(self):
         from typer.testing import CliRunner
-        from pyforge.main import app
+        from app_generator.main import app
 
         runner = CliRunner()
         result = runner.invoke(app, ["create", "--help"])

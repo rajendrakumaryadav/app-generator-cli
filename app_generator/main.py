@@ -4,10 +4,10 @@ AppGenerator CLI — A scaffolding tool for FastAPI and LangChain/LangGraph proj
 import typer
 from rich.console import Console
 
-from pyforge.commands.create import create_app
+from app_generator.commands.create import create_app
 
 app = typer.Typer(
-    name="appgenerator",
+    name="app-generator-cli",
     help="⚒️  AppGenerator — Scaffold production-ready Python projects instantly.",
     no_args_is_help=True,
     rich_markup_mode="rich",
@@ -23,7 +23,7 @@ def main(
     version: bool = typer.Option(False, "--version", "-v", help="Show version and exit."),
 ) -> None:
     if version:
-        from pyforge import __version__
+        from app_generator import __version__
         console.print(f"[bold cyan]AppGenerator[/] version [bold]{__version__}[/]")
         raise typer.Exit()
 

@@ -3,7 +3,7 @@
 from importlib.metadata import metadata
 
 try:
-	_meta = metadata("appgenerator-cli")
+	_meta = metadata("app-generator-cli")
 except Exception:
 	_meta = metadata("pyforge-cli")
 __version__ = _meta["Version"]
