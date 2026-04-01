@@ -1,7 +1,7 @@
 # ⚒ AppGenerator CLI
 
-[![CI](https://github.com/rajendrakumaryadav/pyforge/actions/workflows/ci.yml/badge.svg)](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/appgenerator-cli)](https://pypi.org/project/app-generator-cli/)
+[![CI](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/app-generator-cli)](https://pypi.org/project/app-generator-cli/)
 [![pytest](https://img.shields.io/badge/pytest-3.10%20%7C%203.11%20%7C%203.12-0A9EDC?logo=pytest)](https://github.com/rajendrakumaryadav/app-generator-cli/actions/workflows/ci.yml) 
 
 > Scaffold production-ready Python projects in seconds — powered by `uv`.
