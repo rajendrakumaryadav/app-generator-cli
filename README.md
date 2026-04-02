@@ -6,6 +6,9 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![GitHub issues](https://img.shields.io/github/issues/rajendrakumaryadav/app-generator-cli)](https://github.com/rajendrakumaryadav/app-generator-cli/issues)
 [![GitHub license](https://img.shields.io/github/license/rajendrakumaryadav/app-generator-cli)](https://github.com/rajendrakumaryadav/app-generator-cli/blob/main/LICENSE)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/app-generator-cli?period=weekly&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=BRIGHTGREEN&left_text=downloads)](https://pepy.tech/projects/app-generator-cli)
+
+
 > Scaffold production-ready Python projects in seconds — powered by `uv`.
 
 CI runs `uv run pytest tests/ -v --tb=short` on Python `3.10`, `3.11`, and `3.12`.
